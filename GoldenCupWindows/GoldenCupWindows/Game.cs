@@ -1,3 +1,10 @@
+/****************************************************************************
+ * Contributors: Ryan Hatfield
+ * 
+ * Put other comments here..
+ * 
+ ****************************************************************************/
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,7 +25,7 @@ namespace GoldenCupWindows
     {
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
-
+        List<Projectile> projectiles = new List<Projectile>();
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -34,6 +41,8 @@ namespace GoldenCupWindows
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            Projectile mrProjectile = new Projectile();
+            projectiles.Add(mrProjectile);
 
             base.Initialize();
         }
@@ -46,7 +55,10 @@ namespace GoldenCupWindows
         {
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            foreach (Projectile projectile in projectiles)
+            {
+                projectile.Texture = Content.Load<Texture2D>("rock");
+            }
             // TODO: use this.Content to load your game content here
         }
 
@@ -70,8 +82,9 @@ namespace GoldenCupWindows
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
 
-            // TODO: Add your update logic here
-
+            //update all projectiles
+            foreach (Projectile projectile in projectiles)
+                projectile.Update(gameTime);
             base.Update(gameTime);
         }
 
@@ -83,7 +96,13 @@ namespace GoldenCupWindows
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            // TODO: Add your drawing code here
+            spriteBatch.Begin();
+
+            //draw all projectiles
+            foreach (Projectile projectile in projectiles)
+                projectile.Draw(gameTime,spriteBatch);
+
+            spriteBatch.End();
 
             base.Draw(gameTime);
         }
