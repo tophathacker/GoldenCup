@@ -42,8 +42,17 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="rock.png">
+    <Compile Include="..\..\source files\rock.png">
+      <Link>rock.png</Link>
       <Name>rock</Name>
+      <Importer>TextureImporter</Importer>
+      <Processor>TextureProcessor</Processor>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\..\source files\cobblestone.png">
+      <Link>cobblestone.png</Link>
+      <Name>cobblestone</Name>
       <Importer>TextureImporter</Importer>
       <Processor>TextureProcessor</Processor>
     </Compile>

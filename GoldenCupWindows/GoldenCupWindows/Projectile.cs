@@ -17,16 +17,16 @@ namespace GoldenCupWindows
         public Texture2D Texture;
 
         /// <summary>
-        /// Current position of the Projectile
+        /// Bounding box that tells the size and position of the Projectile
         /// </summary>
-        public Vector2 Position;
+        public Rectangle BoundingBox;
 
         /// <summary>
         /// Constructor for the Projectile class
         /// </summary>
         public Projectile()
         {
-            Position = Vector2.Zero;
+            BoundingBox = new Rectangle(0, 0, 100, 100);
         }
 
         /// <summary>
@@ -49,27 +49,35 @@ namespace GoldenCupWindows
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            /*
+            // this is for using the keyboard to move the projectile around. only for testing.
             KeyboardState state = Keyboard.GetState();
             foreach(Keys key in state.GetPressedKeys())
                 switch (key)
                 {
                     case Keys.Left:
                         // handle left key press
-                        Position.X -= 5;
+                        BoundingBox.X -= 5;
                         break;
                     case Keys.Right:
                         // handle right key press
-                        Position.X += 5;
+                        BoundingBox.X += 5;
                         break;
                     case Keys.Down:
                         // handle down key press
-                        Position.Y += 5;
+                        BoundingBox.Y += 5;
                         break;
                     case Keys.Up:
                         // handle up key press
-                        Position.Y -= 5;
+                        BoundingBox.Y -= 5;
                         break;
                 }
+            */
+
+            // this is for using the mouse to move the projectile around. only for testing.
+            MouseState mouseState = Mouse.GetState();
+            BoundingBox.X = mouseState.X;
+            BoundingBox.Y = mouseState.Y;
         }
 
         /// <summary>
@@ -78,8 +86,8 @@ namespace GoldenCupWindows
         /// <param name="gameTime"></param>
         public void Draw(GameTime gameTime,SpriteBatch spriteBatch)
         {
-            if (Texture != null)
-                spriteBatch.Draw(Texture, new Rectangle((int)Position.X, (int)Position.Y, 100, 100), Color.White);
+            if (Texture != null && BoundingBox != null)
+                spriteBatch.Draw(Texture, BoundingBox, Color.White);
         }
     }
 }

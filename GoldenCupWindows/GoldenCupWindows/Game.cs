@@ -26,6 +26,9 @@ namespace GoldenCupWindows
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
         List<Projectile> projectiles = new List<Projectile>();
+        List<Block> blocks = new List<Block>();
+        Texture2D blockTexture;
+
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
@@ -44,7 +47,31 @@ namespace GoldenCupWindows
             Projectile mrProjectile = new Projectile();
             projectiles.Add(mrProjectile);
 
+
             base.Initialize();
+        }
+
+        private void buildBlocks()
+        {
+            for (int i = 0; i < 500; i += 50)
+            {
+                for (int j = 0; j < 1000; j += 50)
+                {
+                    //make the new block
+                    Block newBlock = new Block();
+                    newBlock.BoundingBox.X = j;
+                    newBlock.BoundingBox.Y = i;
+                    newBlock.Texture = blockTexture;
+
+                    //now make sure the block isn't going to intersect a previous block
+                    bool intersects = false;
+                    foreach (Block block in blocks)
+                        if (newBlock.BoundingBox.Intersects(block.BoundingBox))
+                            intersects = true;
+                    if(!intersects)
+                        blocks.Add(newBlock);
+                }
+            }
         }
 
         /// <summary>
@@ -56,10 +83,9 @@ namespace GoldenCupWindows
             // Create a new SpriteBatch, which can be used to draw textures.
             spriteBatch = new SpriteBatch(GraphicsDevice);
             foreach (Projectile projectile in projectiles)
-            {
                 projectile.Texture = Content.Load<Texture2D>("rock");
-            }
-            // TODO: use this.Content to load your game content here
+            blockTexture = Content.Load<Texture2D>("cobblestone");
+            buildBlocks();
         }
 
         /// <summary>
@@ -79,12 +105,37 @@ namespace GoldenCupWindows
         protected override void Update(GameTime gameTime)
         {
             // Allows the game to exit
-            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
+            if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 this.Exit();
+
+            if (Keyboard.GetState().IsKeyDown(Keys.Space))
+                buildBlocks();
 
             //update all projectiles
             foreach (Projectile projectile in projectiles)
                 projectile.Update(gameTime);
+            //update all blocks
+            foreach (Block block in blocks)
+                block.Update(gameTime);
+
+            //now do some basic collision detection between the projectiles and the blocks
+
+            //list of blocks that intersect with a projectile
+            List<Block> blocksToRemove = new List<Block>();
+
+            foreach (Projectile projectile in projectiles)
+                foreach (Block block in blocks)
+                    if(projectile.BoundingBox.Intersects(block.BoundingBox))
+                        blocksToRemove.Add(block);
+
+            //can't just remove the blocks from the foreach loop, 
+            //have to wait until after .. so remove them now
+            foreach (Block block in blocksToRemove)
+            {
+                blocks.Remove(block);
+            }
+
+
             base.Update(gameTime);
         }
 
@@ -100,7 +151,11 @@ namespace GoldenCupWindows
 
             //draw all projectiles
             foreach (Projectile projectile in projectiles)
-                projectile.Draw(gameTime,spriteBatch);
+                projectile.Draw(gameTime, spriteBatch);
+            
+            //draw all blocks
+            foreach (Block block in blocks)
+                block.Draw(gameTime,spriteBatch);
 
             spriteBatch.End();
 
