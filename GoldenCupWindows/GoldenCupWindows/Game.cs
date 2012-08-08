@@ -28,6 +28,7 @@ namespace GoldenCupWindows
         List<Projectile> projectiles = new List<Projectile>();
         List<Block> blocks = new List<Block>();
         Texture2D blockTexture;
+        Texture2D LevelTexture;
         Camera2d camera;
 
         public Game()
@@ -58,8 +59,22 @@ namespace GoldenCupWindows
             base.Initialize();
         }
 
+        private Color[,] TextureTo2DArray(Texture2D texture)
+        {
+            Color[] colors1D = new Color[texture.Width * texture.Height];
+            texture.GetData(colors1D);
+
+            Color[,] colors2D = new Color[texture.Width, texture.Height];
+            for (int x = 0; x < texture.Width; x++)
+                for (int y = 0; y < texture.Height; y++)
+                    colors2D[x, y] = colors1D[x + y * texture.Width];
+
+            return colors2D;
+        }
+
         private void buildBlocks()
         {
+            /*
             for (int i = 0; i < GraphicsDevice.Viewport.Height; i += 50)
             {
                 for (int j = 0; j < GraphicsDevice.Viewport.Width; j += 50)
@@ -79,6 +94,31 @@ namespace GoldenCupWindows
                         blocks.Add(newBlock);
                 }
             }
+             */
+
+            Color[,] levelData = TextureTo2DArray(LevelTexture);
+            for (int i = 0; i < LevelTexture.Width; i++)
+            {
+                for (int j = 0; j < LevelTexture.Height; j++)
+                {
+                    if (levelData[i, j] == Color.Black)
+                    {
+                        //make the new block
+                        Block newBlock = new Block();
+                        newBlock.BoundingBox.X = i*10;
+                        newBlock.BoundingBox.Y = j*10;
+                        newBlock.Texture = blockTexture;
+
+                        //now make sure the block isn't going to intersect a previous block
+                        bool intersects = false;
+                        foreach (Block block in blocks)
+                            if (newBlock.BoundingBox.Intersects(block.BoundingBox))
+                                intersects = true;
+                        if (!intersects)
+                            blocks.Add(newBlock);
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -92,6 +132,7 @@ namespace GoldenCupWindows
             foreach (Projectile projectile in projectiles)
                 projectile.Texture = Content.Load<Texture2D>("rock");
             blockTexture = Content.Load<Texture2D>("cobblestone");
+            LevelTexture = Content.Load<Texture2D>("LevelDesign");
             buildBlocks();
         }
 
@@ -140,6 +181,9 @@ namespace GoldenCupWindows
                         break;
                     case Keys.S:
                         camera.Pos = new Vector2(camera.Pos.X, camera.Pos.Y + 1);
+                        break;
+                    case Keys.F10:
+                        graphics.ToggleFullScreen();
                         break;
                 }
 
