@@ -26,7 +26,7 @@ namespace GoldenCupWindows
         /// </summary>
         public Projectile()
         {
-            BoundingBox = new Rectangle(0, 0, 100, 100);
+            BoundingBox = new Rectangle(0, 0, 25, 25);
         }
 
         /// <summary>
@@ -75,9 +75,10 @@ namespace GoldenCupWindows
             */
 
             // this is for using the mouse to move the projectile around. only for testing.
-            MouseState mouseState = Mouse.GetState();
-            BoundingBox.X = mouseState.X;
-            BoundingBox.Y = mouseState.Y;
+            //MouseState mouseState = Mouse.GetState();
+            //BoundingBox.X = mouseState.X;
+            //BoundingBox.Y = mouseState.Y;
+            
         }
 
         /// <summary>

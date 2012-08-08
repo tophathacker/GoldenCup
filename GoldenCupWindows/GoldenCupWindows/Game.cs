@@ -28,11 +28,17 @@ namespace GoldenCupWindows
         List<Projectile> projectiles = new List<Projectile>();
         List<Block> blocks = new List<Block>();
         Texture2D blockTexture;
+        Camera2d camera;
 
         public Game()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+
+            camera = new Camera2d();
+            //camera.Pos = new Vector2(500.0f, 200.0f);
+            // camera.Zoom = 2.0f // Example of Zoom in
+            // camera.Zoom = 0.5f // Example of Zoom out
         }
 
         /// <summary>
@@ -47,15 +53,16 @@ namespace GoldenCupWindows
             Projectile mrProjectile = new Projectile();
             projectiles.Add(mrProjectile);
 
+            graphics.PreferMultiSampling = false;
 
             base.Initialize();
         }
 
         private void buildBlocks()
         {
-            for (int i = 0; i < 500; i += 50)
+            for (int i = 0; i < GraphicsDevice.Viewport.Height; i += 50)
             {
-                for (int j = 0; j < 1000; j += 50)
+                for (int j = 0; j < GraphicsDevice.Viewport.Width; j += 50)
                 {
                     //make the new block
                     Block newBlock = new Block();
@@ -111,6 +118,31 @@ namespace GoldenCupWindows
             if (Keyboard.GetState().IsKeyDown(Keys.Space))
                 buildBlocks();
 
+            KeyboardState state = Keyboard.GetState();
+            foreach (Keys key in state.GetPressedKeys())
+                switch (key)
+                {
+                    case Keys.Q:
+                        // handle left key press
+                        camera.Zoom -= .01f;
+                        break;
+                    case Keys.E:
+                        camera.Zoom += .01f;
+                        break;
+                    case Keys.A:
+                        camera.Pos = new Vector2(camera.Pos.X - 1, camera.Pos.Y);
+                        break;
+                    case Keys.D:
+                        camera.Pos = new Vector2(camera.Pos.X + 1, camera.Pos.Y);
+                        break;
+                    case Keys.W:
+                        camera.Pos = new Vector2(camera.Pos.X, camera.Pos.Y - 1);
+                        break;
+                    case Keys.S:
+                        camera.Pos = new Vector2(camera.Pos.X, camera.Pos.Y + 1);
+                        break;
+                }
+
             //update all projectiles
             foreach (Projectile projectile in projectiles)
                 projectile.Update(gameTime);
@@ -135,9 +167,16 @@ namespace GoldenCupWindows
                 blocks.Remove(block);
             }
 
+            foreach (Projectile projectile in projectiles)
+            {
+                projectile.BoundingBox.X = (int)camera.get_mouse_vpos().X;
+                projectile.BoundingBox.Y = (int)camera.get_mouse_vpos().Y;
+            }
 
             base.Update(gameTime);
         }
+
+        
 
         /// <summary>
         /// This is called when the game should draw itself.
@@ -147,7 +186,13 @@ namespace GoldenCupWindows
         {
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
-            spriteBatch.Begin();
+            spriteBatch.Begin(SpriteSortMode.BackToFront,
+                        BlendState.AlphaBlend,
+                        null,
+                        null,
+                        null,
+                        null,
+                        camera.get_transformation(GraphicsDevice));
 
             //draw all projectiles
             foreach (Projectile projectile in projectiles)

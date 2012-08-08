@@ -25,7 +25,7 @@ namespace GoldenCupWindows
         /// </summary>
         public Block()
         {
-            BoundingBox = new Rectangle(0, 0, 50, 50);
+            BoundingBox = new Rectangle(0, 0, 10, 10);
         }
 
         /// <summary>
